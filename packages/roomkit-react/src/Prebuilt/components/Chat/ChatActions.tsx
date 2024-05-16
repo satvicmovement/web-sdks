@@ -195,18 +195,20 @@ export const ChatActions = ({
             </Sheet.Close>
           </Sheet.Title>
 
-          {Object.keys(options).map(optionKey => {
-            const option = options[optionKey];
-            return option.show ? (
-              <MwebChatOption
-                key={optionKey}
-                text={option.text}
-                icon={option.icon}
-                onClick={option.onClick}
-                color={option?.color}
-              />
-            ) : null;
-          })}
+          {Object.keys(options)
+            .filter(key => key !== 'pin')
+            .map(optionKey => {
+              const option = options[optionKey];
+              return option.show ? (
+                <MwebChatOption
+                  key={optionKey}
+                  text={option.text}
+                  icon={option.icon}
+                  onClick={option.onClick}
+                  color={option?.color}
+                />
+              ) : null;
+            })}
         </Sheet.Content>
       </Sheet.Root>
     );
@@ -242,13 +244,13 @@ export const ChatActions = ({
             </IconButton>
           </Tooltip>
         ) : null}
-        {options.pin.show ? (
+        {/* {options.pin.show ? (
           <Tooltip boxCss={tooltipBoxCSS} title={options.pin.tooltipText}>
             <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
               {options.pin.icon}
             </IconButton>
           </Tooltip>
-        ) : null}
+        ) : null} */}
 
         {options.copy.show ? (
           <Tooltip boxCss={tooltipBoxCSS} title={options.copy.tooltipText}>

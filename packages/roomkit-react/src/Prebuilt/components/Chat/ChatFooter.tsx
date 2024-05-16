@@ -6,7 +6,7 @@ import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100m
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
-import { MoreSettings } from '../MoreSettings/MoreSettings';
+// import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
@@ -79,7 +79,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const { elements, screenType } = useRoomLayoutConferencingScreen();
+  const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
@@ -274,7 +274,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 gap="2"
               >
                 <RaiseHand css={{ bg: '$surface_default' }} />
-                <MoreSettings elements={elements} screenType={screenType} />
+                {/* <MoreSettings elements={elements} screenType={screenType} /> */}
               </Flex>
             </>
           )}
