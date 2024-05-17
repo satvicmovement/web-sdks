@@ -19,7 +19,7 @@ import { ScreenshareToggle } from '../ScreenShareToggle';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
-import { ParticipantCount } from './ParticipantList';
+// import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
 import { WhiteboardToggle } from './WhiteboardToggle';
 import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -107,8 +107,8 @@ export const Footer = ({
         <WhiteboardToggle />
         {showPolls && <PollsToggle />}
         {!isMobile && elements?.chat && <ChatToggle />}
-        {elements?.participant_list && <ParticipantCount />}
-        <MoreSettings elements={elements} screenType={screenType} />
+        {/* {elements?.participant_list && <ParticipantCount />} */}
+        {/* <MoreSettings elements={elements} screenType={screenType} /> */}
       </AppFooter.Right>
     </AppFooter.Root>
   );

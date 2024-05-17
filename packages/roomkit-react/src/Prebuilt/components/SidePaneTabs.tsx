@@ -177,10 +177,10 @@ export const SidePaneTabs = React.memo<{
                   <Tabs.Trigger value={SIDE_PANE_OPTIONS.CHAT} onClick={toggleChat} css={tabTriggerCSS}>
                     {chat_title}
                   </Tabs.Trigger>
-                  <Tabs.Trigger value={SIDE_PANE_OPTIONS.PARTICIPANTS} onClick={toggleParticipants} css={tabTriggerCSS}>
+                  {/* <Tabs.Trigger value={SIDE_PANE_OPTIONS.PARTICIPANTS} onClick={toggleParticipants} css={tabTriggerCSS}>
                     Participants&nbsp;
                     <ParticipantCount count={peerCount} />
-                  </Tabs.Trigger>
+                  </Tabs.Trigger> */}
                 </Tabs.List>
                 {showChatSettings ? <ChatSettings /> : null}
                 {isOverlayChat && isChatOpen ? null : (
