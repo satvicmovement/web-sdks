@@ -397,11 +397,11 @@ const HLSView = () => {
   const onClickHandler = useCallback(async () => {
     match({ isMobile, isLandscape, playlist_type: hlsState?.variants[0]?.playlist_type })
       .with({ playlist_type: HLSPlaylistType.DVR, isMobile: false, isLandscape: false }, async () => {
-        if (isPaused) {
-          await hlsPlayer?.play();
-        } else {
-          hlsPlayer?.pause();
-        }
+        // if (isPaused) {
+        //   await hlsPlayer?.play();
+        // } else {
+        //   hlsPlayer?.pause();
+        // }
       })
       .when(
         ({ isMobile, isLandscape }) => isMobile || isLandscape,
@@ -413,7 +413,7 @@ const HLSView = () => {
         },
       )
       .otherwise(() => null);
-  }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
+  }, [hlsState?.variants, isLandscape, isMobile]);
 
   const onHoverHandler = useCallback(
     event => {
