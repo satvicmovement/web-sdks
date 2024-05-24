@@ -402,11 +402,12 @@ const VirtualizedChatMessages = React.forwardRef<
 
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
+    const hmsActions = useHMSActions();
     const messages = useHMSStore(selectHMSMessages);
     const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
     const filteredMessages = useMemo(() => {
       const blacklistedMessageIDSet = new Set(blacklistedMessageIDs || []);
-      return messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [];
+      return messages?.filter(message => !blacklistedMessageIDSet.has(message.id)) || [];
     }, [blacklistedMessageIDs, messages]);
 
     const vanillaStore = useHMSVanillaStore();
@@ -429,6 +430,24 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       }, selectUnreadHMSMessagesCount);
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
+
+    useEffect(() => {
+      // @ts-ignore
+      if (filteredMessages.length > 0) {
+        const lastmessage = filteredMessages[filteredMessages.length - 1];
+        const has_disableparams =
+          lastmessage.sender === '' &&
+          lastmessage.senderName === '' &&
+          lastmessage.senderRole === '' &&
+          lastmessage.senderUserId === '';
+        if (lastmessage.message === 'Chat is disabled now' && has_disableparams) {
+          hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: false });
+        } else if (lastmessage.message === 'Chat is enabled now' && has_disableparams) {
+          hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: true });
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filteredMessages]);
 
     useEffect(() => {
       // @ts-ignore

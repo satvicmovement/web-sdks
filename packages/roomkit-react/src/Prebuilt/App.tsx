@@ -48,7 +48,7 @@ import {
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
-import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
+import { DEFAULT_PORTAL_CONTAINER, SESSION_STORE_KEY } from './common/constants';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -67,6 +67,9 @@ export type HMSPrebuiltProps = {
   authToken?: string;
   onLeave?: () => void;
   onJoin?: () => void;
+  smAppProps?: {
+    chatEnabled: boolean;
+  };
   /**
    * @remarks
    * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
@@ -94,6 +97,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
       onLeave,
       onJoin,
+      smAppProps,
     },
     ref,
   ) => {
@@ -131,6 +135,17 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
+
+    useEffect(() => {
+      if (smAppProps) {
+        setTimeout(() => {
+          reactiveStore?.current?.hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, {
+            smchatstatus: smAppProps.chatEnabled,
+          });
+        }, 1000);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [smAppProps, reactiveStore?.current]);
 
     const endpointsObj = endpoints as
       | {
@@ -173,6 +188,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             containerSelector,
             onLeave,
             onJoin,
+            smAppProps,
             userName,
             userId,
             endpoints: {
