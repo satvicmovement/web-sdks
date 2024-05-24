@@ -10,6 +10,9 @@ type HMSPrebuiltContextType = {
   endpoints?: Record<string, string>;
   onLeave?: () => void;
   onJoin?: () => void;
+  smAppProps?: {
+    chatEnabled: boolean;
+  };
 };
 
 export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
@@ -20,6 +23,7 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   endpoints: {},
   onLeave: undefined,
   onJoin: undefined,
+  smAppProps: { chatEnabled: true },
 });
 
 HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';

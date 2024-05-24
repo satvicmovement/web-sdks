@@ -24,6 +24,8 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
+  const { smchatstatus: isSMChatEnabled = true } =
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.SM_CHAT_STATUS)) || {};
   const isMobile = useMedia(cssConfig.media.md);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
@@ -62,7 +64,7 @@ export const Chat = () => {
       <ChatPaused />
       <ChatBlocked />
       {isMobile && elements?.chat?.is_overlay && !streaming ? <PinnedMessage /> : null}
-      {isChatEnabled ? (
+      {isChatEnabled && isSMChatEnabled ? (
         <ChatFooter onSend={scrollToBottom}>
           <NewMessageIndicator scrollToBottom={scrollToBottom} listRef={listRef} />
         </ChatFooter>
