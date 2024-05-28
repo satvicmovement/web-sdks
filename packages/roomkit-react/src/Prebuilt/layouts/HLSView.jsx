@@ -23,7 +23,7 @@ import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
 import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 // import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
-import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
+// import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
 import { HMSPlayerContext } from '../components/HMSVideo/PlayerContext';
 import { LeaveRoom } from '../components/Leave/LeaveRoom';
 import { ToastManager } from '../components/Toast/ToastManager';
@@ -740,7 +740,7 @@ const HLSView = () => {
         </Flex>
       </HMSPlayerContext.Provider>
       <ToggleChat isFullScreen={isFullScreen} />
-      {isMobile && !isFullScreen && <HLSViewTitle />}
+      {/* {isMobile && !isFullScreen && <HLSViewTitle />} */}
     </Flex>
   );
 };
