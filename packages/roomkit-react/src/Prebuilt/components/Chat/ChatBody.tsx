@@ -136,10 +136,24 @@ const Link = styled('a', {
   },
 });
 
-export const AnnotisedMessage = ({ message, length }: { message: string; length?: number }) => {
+export const AnnotisedMessage = ({
+  message,
+  length,
+  msgdetails,
+}: {
+  message: string;
+  length?: number;
+  msgdetails?: HMSMessage;
+}) => {
   if (!message) {
     return <Fragment />;
   }
+
+  const is_clickable =
+    msgdetails?.sender === '' &&
+    msgdetails?.senderName === '' &&
+    msgdetails?.senderRole === '' &&
+    msgdetails?.senderUserId === '';
 
   return (
     <Fragment>
@@ -147,7 +161,7 @@ export const AnnotisedMessage = ({ message, length }: { message: string; length?
         .trim()
         .split(/(\s)/)
         .map(part =>
-          URL_REGEX.test(part) ? (
+          URL_REGEX.test(part) && is_clickable ? (
             <Link href={part} key={part} target="_blank" rel="noopener noreferrer">
               {part.slice(0, length)}
             </Link>
@@ -329,7 +343,7 @@ const ChatMessage = React.memo(
               setOpenSheet(true, e);
             }}
           >
-            <AnnotisedMessage message={message.message} />
+            <AnnotisedMessage message={message.message} msgdetails={message} />
           </Text>
         </Flex>
       </Box>
