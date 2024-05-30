@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { ActionBatcher } from './sdkUtils/ActionBatcher';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
@@ -1156,6 +1157,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    hmsMessage.id = hmsMessage.id.length === 0 ? uuid() : hmsMessage.id;
     if (hmsMessage.type === 'hms_transcript') {
       hmsMessage.ignored = true;
     }
