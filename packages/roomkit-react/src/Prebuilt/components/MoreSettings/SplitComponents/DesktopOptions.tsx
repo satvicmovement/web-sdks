@@ -6,14 +6,33 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
-import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
+import {
+  HMSTranscriptionMode,
+  selectAppData,
+  selectIsTranscriptionAllowedByMode,
+  selectIsTranscriptionEnabled,
+  selectLocalPeerID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import {
+  BrbIcon,
+  CheckIcon,
+  HamburgerMenuIcon,
+  InfoIcon,
+  OpenCaptionIcon,
+  PipIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
+import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
+import { PIPChat } from '../../PIP/PIPChat';
 // @ts-ignore: No implicit any
+import { PIPChatOption } from '../../PIP/PIPChatOption';
 import { PictureInPicture } from '../../PIP/PIPManager';
+import { PIPWindow } from '../../PIP/PIPWindow';
 // @ts-ignore: No implicit any
 import { RoleChangeModal } from '../../RoleChangeModal';
 // @ts-ignore: No implicit any
@@ -24,14 +43,19 @@ import StartRecording from '../../Settings/StartRecording';
 import { StatsForNerds } from '../../StatsForNerds';
 // @ts-ignore: No implicit any
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../../AppData/useSidepane';
+// @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 // @ts-ignore: No implicit any
-import { APP_DATA, isMacOS } from '../../../common/constants';
+import { usePIPChat } from '../../PIP/usePIPChat';
+// @ts-ignore: No implicit any
+import { APP_DATA, isMacOS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -43,6 +67,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  CAPTION: 'caption',
 };
 
 export const DesktopOptions = ({
@@ -59,6 +84,12 @@ export const DesktopOptions = ({
   const { isBRBOn, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
   const isBRBEnabled = !!elements?.brb;
+  const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const { isSupported, pipWindow, requestPipWindow } = usePIPChat();
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const showPipChatOption = !!elements?.chat && isSupported;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -78,6 +109,11 @@ export const DesktopOptions = ({
 
   return (
     <Fragment>
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          <PIPChat />
+        </PIPWindow>
+      ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
@@ -114,12 +150,30 @@ export const DesktopOptions = ({
               </Flex>
             </Dropdown.Item>
           ) : null}
-
+          {isTranscriptionAllowed ? (
+            <Dropdown.Item
+              data-testid="closed_caption_admin"
+              onClick={() => {
+                updateState(MODALS.CAPTION, true);
+              }}
+            >
+              <OpenCaptionIcon />
+              <Flex direction="column" css={{ flexGrow: '1' }}>
+                <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                  Closed Captions
+                </Text>
+                <Text variant="caption" css={{ ml: '$4', color: '$on_surface_medium' }}>
+                  {isTranscriptionEnabled ? 'Enabled' : 'Disabled'}
+                </Text>
+              </Flex>
+              <Switch id="closed_caption_start_stop" checked={isTranscriptionEnabled} disabled={false} />
+            </Dropdown.Item>
+          ) : null}
           {screenType !== 'hls_live_streaming' ? (
-            <Dropdown.Item css={{ '&:empty': { display: 'none' } }}>
+            <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
               <PIP
                 content={
-                  <Flex css={{ w: '100%' }}>
+                  <Flex css={{ w: '100%', h: '100%', p: '$8' }}>
                     <PipIcon />
                     <Text variant="sm" css={{ ml: '$4' }}>
                       {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
@@ -130,13 +184,15 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
+          <PIPChatOption
+            showPIPChat={showPipChatOption}
+            openChat={async () => {
+              isChatOpen && toggleChat();
+              await requestPipWindow(350, 500);
+            }}
+          />
           <FullScreenItem />
-          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )} */}
-
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
-
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
@@ -210,6 +266,9 @@ export const DesktopOptions = ({
           peerId={localPeerId}
           onOpenChange={(value: boolean) => updateState(MODALS.SELF_ROLE_CHANGE, value)}
         />
+      )}
+      {openModals.has(MODALS.CAPTION) && (
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />

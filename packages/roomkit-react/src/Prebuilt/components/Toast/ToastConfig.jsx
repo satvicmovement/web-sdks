@@ -111,7 +111,7 @@ export const ToastConfig = {
       const count = new Set(notifications.map(notification => notification.data?.id)).size;
       return {
         title: `${notifications[notifications.length - 1].data?.name} ${
-          count > 1 ? `${count} and others` : ''
+          count > 1 ? `and ${count} others` : ''
         } raised hand`,
         icon: <HandIcon />,
       };
@@ -129,7 +129,7 @@ export const ToastConfig = {
       const count = new Set(notifications.map(notification => notification.data?.id)).size;
       return {
         title: `${notifications[notifications.length - 1].data?.name} ${
-          count > 1 ? `${count} and others` : ''
+          count > 1 ? `and ${count} others` : ''
         } raised hand`,
         icon: <HandIcon />,
         action: <HandRaiseAction isSingleHandRaise={false} />,
@@ -153,9 +153,9 @@ export const ToastConfig = {
     },
   },
   RECONNECTED: {
-    single: () => {
+    single: online => {
       return {
-        title: `You are now connected`,
+        title: `You are now ${online ? 'online' : 'connected'}`,
         icon: <ConnectivityIcon />,
         variant: 'success',
         duration: 3000,

@@ -24,16 +24,18 @@ import { ChatNotifications } from './ChatNotifications';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
-import { PermissionErrorModal } from './PermissionErrorModal';
+import { PermissionErrorNotificationModal } from './PermissionErrorModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { TranscriptionNotifications } from './TranscriptionNotifications';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
+import { usePIPWindow } from '../PIP/usePIPWindow';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
@@ -51,6 +53,7 @@ export function Notifications() {
   const { showNotification } = useAwayNotifications();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const logoURL = useRoomLayout()?.logo?.url;
+  const { pipWindow } = usePIPWindow();
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -171,7 +174,7 @@ export function Notifications() {
         }
         break;
       case HMSNotificationTypes.NEW_MESSAGE:
-        if (amIScreenSharing) {
+        if (amIScreenSharing && !notification.data?.ignored && !pipWindow) {
           showNotification(`New message from ${notification.data.senderName}`, {
             body: notification.data.message,
             icon: logoURL,
@@ -196,10 +199,11 @@ export function Notifications() {
       {roomState === HMSRoomState.Connected ? <PeerNotifications /> : null}
       <ReconnectNotifications />
       <AutoplayBlockedModal />
-      <PermissionErrorModal />
+      <PermissionErrorNotificationModal />
       <InitErrorModal />
       <ChatNotifications />
       <HandRaisedNotifications />
+      <TranscriptionNotifications />
     </>
   );
 }

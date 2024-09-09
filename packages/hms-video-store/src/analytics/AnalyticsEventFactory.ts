@@ -243,6 +243,31 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static krispStart() {
+    return new AnalyticsEvent({
+      name: 'krisp.start',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static krispStop() {
+    return new AnalyticsEvent({
+      name: 'krisp.stop',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static interruption(started: boolean, type: string, deviceInfo: Partial<MediaDeviceInfo>) {
+    return new AnalyticsEvent({
+      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        type,
+        ...deviceInfo,
+      },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
