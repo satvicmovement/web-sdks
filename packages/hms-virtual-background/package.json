@@ -32,10 +32,10 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video-store": "0.12.18"
+    "@100mslive/hms-video-store": "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.18.1.tgz"
   },
   "devDependencies": {
-    "@100mslive/hms-video-store": "0.12.18"
+    "@100mslive/hms-video-store": "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.18.1.tgz"
   },
   "dependencies": {
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
