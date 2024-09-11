@@ -141,11 +141,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
     useEffect(() => {
       if (smAppProps) {
-        setTimeout(() => {
-          reactiveStore?.current?.hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, {
+        setTimeout(async () => {
+          if (!reactiveStore?.current) {
+            return;
+          }
+          console.log('[RJS Info] will update chatStatus to :: ', smAppProps.chatEnabled);
+          await reactiveStore.current.hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, {
             smchatstatus: smAppProps.chatEnabled,
           });
-        }, 1000);
+        }, 3000);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [smAppProps, reactiveStore?.current]);
