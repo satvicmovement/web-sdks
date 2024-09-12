@@ -7,6 +7,28 @@
   resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.1.tgz#037c8bdfb6b2d7bf12f9d257422150fe6ca43acb"
   integrity sha512-DGnzcXRDJREWypIjGX70er+f2k/XLLRF41lrXPs1+PtB1imdEkECPPS0Fg4BA0BCWKDNAGTZBHZPrBDgUmr9Lw==
 
+"@100mslive/hms-video-store@https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.9.1.tgz":
+  version "0.12.9"
+  resolved "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.9.1.tgz#da79cd66168f054dd8d1988a238d307f3b59098c"
+  dependencies:
+    eventemitter2 "^6.4.9"
+    immer "^9.0.6"
+    lodash.isequal "^4.5.0"
+    reselect "4.0.0"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+    zustand "3.5.7"
+
+"@100mslive/react-sdk@https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-react-sdk-0.10.9.1.tgz":
+  version "0.10.9"
+  resolved "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-react-sdk-0.10.9.1.tgz#6f6b091469d4eb976956d6ce93e958087a15de24"
+  dependencies:
+    "@100mslive/hms-video-store" "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.9.1.tgz"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
+
 "@100mslive/types-prebuilt@0.12.8":
   version "0.12.8"
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.8.tgz#2fe9007eb14e66ad3ba687313c4254e2ed085629"
