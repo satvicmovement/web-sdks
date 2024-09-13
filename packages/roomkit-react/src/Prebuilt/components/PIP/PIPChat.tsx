@@ -120,7 +120,7 @@ export const PIPChat = () => {
                   <Flex style={{ flexGrow: 1, gap: '2px', alignItems: 'center' }}>
                     {message.senderName === 'You' || !message.senderName ? (
                       <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                        {message.senderName || 'Anonymous'}
+                        {message.senderName || 'Satvic Movement'}
                       </Text>
                     ) : (
                       <Tooltip title={message.senderName} side="top" align="start">

@@ -279,7 +279,7 @@ const ChatMessage = React.memo(
                   variant="sub2"
                   css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
                 >
-                  {message.senderName || 'Anonymous'}
+                  {message.senderName || 'Satvic Movement'}
                 </SenderName>
               ) : (
                 <Tooltip title={message.senderName} side="top" align="start" boxCss={{ zIndex: 50 }}>
