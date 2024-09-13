@@ -159,10 +159,12 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           init: string;
           tokenByRoomCode: string;
           roomLayout: string;
+          event: string;
         }
       | undefined;
     const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
     const initEndpoint: string = endpointsObj?.init || '';
+    const eventEndpoint: string = endpointsObj?.event || '';
     const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
 
     const overrideLayout: Partial<Layout> = {
@@ -202,6 +204,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
+              event: eventEndpoint,
             },
           }}
         >
@@ -323,7 +326,11 @@ function AppRoutes({
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        <AuthToken
+          authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+          defaultAuthToken={defaultAuthToken}
+          activeState={activeState}
+        />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
     </AppStateContext.Provider>
