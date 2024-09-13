@@ -11,6 +11,7 @@ export type { IHMSNotifications as HMSNotifications } from './schema/notificatio
 export * from './selectors';
 export * from './webrtc-stats';
 export {
+  HMSAudioMode,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
@@ -53,6 +54,7 @@ export type {
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   HMSTranscriptionInfo,
+  HMSICEServer,
 } from './internal';
 
 export { EventBus } from './events/EventBus';
@@ -72,4 +74,5 @@ export type {
   HMSPluginSupportResult,
   HMSFrameworkInfo,
 } from './internal';
+export * from './diagnostics';
 export { DomainCategory } from './analytics/AnalyticsEventDomains';

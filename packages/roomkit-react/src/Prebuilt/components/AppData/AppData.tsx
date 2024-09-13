@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -10,6 +11,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
@@ -17,16 +19,16 @@ import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPrefere
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 // @ts-ignore
-import { useSetAppDataByKey } from './useUISettings';
+import { useSetAppDataByKey, useSetNoiseCancellation } from './useUISettings';
 import {
   APP_DATA,
   CHAT_SELECTOR,
-  DEFAULT_WAITING_VIEWER_ROLE,
   POLL_STATE,
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
+import { DEFAULT_TILES_IN_VIEW } from '../MoreSettings/constants';
 
 const initialAppData = {
   [APP_DATA.uiSettings]: {
@@ -56,7 +58,6 @@ const initialAppData = {
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
-  [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
@@ -68,8 +69,9 @@ const initialAppData = {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
-  // by default off, so it will not appear in beam bots
+  // by default on because of on demand now, for beam disabled
   [APP_DATA.caption]: false,
+  [APP_DATA.noiseCancellation]: false,
 };
 
 export const AppData = React.memo(() => {
@@ -80,6 +82,14 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
+  const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
+  const isMobile = useMedia(cssConfig.media.md);
+
+  useEffect(() => {
+    if (elements?.noise_cancellation?.enabled_by_default) {
+      setNoiseCancellationEnabled(true);
+    }
+  }, [elements?.noise_cancellation?.enabled_by_default, setNoiseCancellationEnabled]);
 
   const defaultMediaURL = useMemo(() => {
     const media = elements?.virtual_background?.background_media || [];
@@ -113,7 +123,19 @@ export const AppData = React.memo(() => {
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, hmsActions]);
+  }, [hmsActions, preferences]);
+
+  useEffect(() => {
+    hmsActions.setAppData(
+      APP_DATA.uiSettings,
+      {
+        [UI_SETTINGS.maxTileCount]: isMobile
+          ? DEFAULT_TILES_IN_VIEW.MWEB
+          : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
+      },
+      true,
+    );
+  }, [hmsActions, isMobile, elements?.video_tile_layout?.grid?.tiles_in_view]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {

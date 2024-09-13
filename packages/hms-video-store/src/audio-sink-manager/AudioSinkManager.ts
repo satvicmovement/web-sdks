@@ -5,11 +5,11 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { isMobile } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { isMobile } from '../utils/support';
 import { sleep } from '../utils/timer-utils';
 
 /**
@@ -41,6 +41,7 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
+  private autoUnpauseTimer: ReturnType<typeof setInterval> | null = null;
   private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
@@ -49,6 +50,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.startPollingForDevices();
+    this.startPollingToCheckPausedAudio();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -95,10 +97,15 @@ export class AudioSinkManager {
 
   cleanup() {
     this.audioSink?.remove();
+    this.earpieceSelected = false;
     this.audioSink = undefined;
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
+    }
+    if (this.autoUnpauseTimer) {
+      clearInterval(this.autoUnpauseTimer);
+      this.autoUnpauseTimer = null;
     }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
@@ -109,24 +116,11 @@ export class AudioSinkManager {
   }
 
   private handleAudioPaused = async (event: any) => {
-    const audioEl = event.target as HTMLAudioElement;
-    //@ts-ignore
-    const track = audioEl.srcObject?.getAudioTracks()[0];
-    if (!track?.enabled) {
-      // No need to play if already disabled
-      return;
-    }
-    // this means the audio paused because of external factors(headset removal)
+    // this means the audio paused because of external factors(headset removal, incoming phone call)
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
-      if (isMobile()) {
-        // Play after a delay since mobile devices don't call onDevice change event
-        await sleep(500);
-        this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
-      } else {
-        this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
-      }
+      this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
     }
   };
 
@@ -272,6 +266,14 @@ export class AudioSinkManager {
     }
   };
 
+  private startPollingToCheckPausedAudio = () => {
+    if (isMobile()) {
+      this.autoUnpauseTimer = setInterval(() => {
+        this.unpauseAudioTracks();
+      }, 5000);
+    }
+  };
+
   private startPollingForDevices = () => {
     // device change supported, no polling needed
     if ('ondevicechange' in navigator.mediaDevices) {
@@ -281,6 +283,7 @@ export class AudioSinkManager {
       (async () => {
         await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
+        this.unpauseAudioTracks();
       })();
     }, 5000);
   };
@@ -293,32 +296,18 @@ export class AudioSinkManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
-    let bluetoothDevice: InputDeviceInfo | null = null;
-    let speakerPhone: InputDeviceInfo | null = null;
-    let wired: InputDeviceInfo | null = null;
-    let earpiece: InputDeviceInfo | null = null;
-
-    for (const device of this.deviceManager.audioInput) {
-      const label = device.label.toLowerCase();
-      if (label.includes('speakerphone')) {
-        speakerPhone = device;
-      } else if (label.includes('wired')) {
-        wired = device;
-      } else if (label.includes('bluetooth')) {
-        bluetoothDevice = device;
-      } else if (label.includes('earpiece')) {
-        earpiece = device;
-      }
-    }
+    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (localAudioTrack && earpiece) {
-      const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+      const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
+      const externalDeviceID =
+        manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
       HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
       // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
-      if (!this.earpieceSelected) {
+      if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }

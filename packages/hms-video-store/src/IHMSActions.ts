@@ -1,3 +1,6 @@
+import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
+import { TranscriptionConfig } from './interfaces/transcription-config';
+import { FindPeerByNameRequestParams } from './signal/interfaces';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -24,6 +27,7 @@ import {
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
+  HMSPeer,
   HMSPeerID,
   HMSPeerListIterator,
   HMSPeerListIteratorOptions,
@@ -164,12 +168,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
+
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+
   /**
    * Toggle the camera between front and back if the both the camera's exist
    */
@@ -371,6 +377,18 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
   /**
+   * If you want to start transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription. Currently we have Caption mode only
+   */
+  startTranscription(params: TranscriptionConfig): Promise<void>;
+
+  /**
+   * If you want to stop transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription you want to stop. Currently we have Caption mode only
+   */
+  stopTranscription(params: TranscriptionConfig): Promise<void>;
+
+  /**
    * @alpha
    * Used to define date range metadata in a media playlist.
    * This api adds EXT-X-DATERANGE tags to the media playlist.
@@ -546,9 +564,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
+  getPeer(peerId: string): Promise<HMSPeer | undefined>;
+  findPeerByName(options: FindPeerByNameRequestParams): Promise<{ offset: number; eof?: boolean; peers: HMSPeer[] }>;
   /**
    * Method to override the default settings for playlist tracks
    * @param {HMSPlaylistSettings} settings
    */
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
+
+  initDiagnostics(): HMSDiagnosticsInterface;
 }

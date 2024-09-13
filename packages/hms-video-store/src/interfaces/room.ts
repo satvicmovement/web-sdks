@@ -33,13 +33,8 @@ export interface HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
-  /**
-   * @alpha
-   */
   isEffectsEnabled?: boolean;
-  /**
-   * @alpha
-   */
+  isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
@@ -123,6 +118,7 @@ export interface HLSVariant {
 Transcription related details
 */
 export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
   STARTED = 'started',
   STOPPED = 'stopped',
   FAILED = 'failed',
@@ -133,4 +129,9 @@ export enum HMSTranscriptionMode {
 export interface HMSTranscriptionInfo {
   state?: HMSTranscriptionState;
   mode?: HMSTranscriptionMode;
+  initialised_at?: Date;
+  started_at?: Date;
+  updated_at?: Date;
+  stopped_at?: Date;
+  error?: HMSException;
 }

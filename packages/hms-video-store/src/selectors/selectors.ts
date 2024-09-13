@@ -63,7 +63,7 @@ export const selectTracksMap = (store: HMSStore) => store.tracks;
 
 /**
  * Select your media settings
- * i.e., choosen audio input device, audio output device and video input device.
+ * i.e., choosen audio input device, audio output device and video input device, audio mode
  * @param store
  */
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
@@ -452,10 +452,12 @@ export const selectPermissions = createSelector(selectLocalPeerRole, role => rol
 export const selectRecordingState = createSelector(selectRoom, room => room.recording);
 export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
+export const selectTranscriptionsState = createSelector(selectRoom, room => room.transcriptions);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
 export const selectIsLargeRoom = createSelector(selectRoom, room => !!room.isLargeRoom);
 export const selectIsEffectsEnabled = createSelector(selectRoom, room => !!room.isEffectsEnabled);
+export const selectIsVBEnabled = createSelector(selectRoom, room => !!room.isVBEnabled);
 export const selectEffectsKey = createSelector(selectRoom, room => room.effectsKey);
 
 export const selectTemplateAppData = (store: HMSStore) => store.templateAppData;
