@@ -20,13 +20,13 @@ import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
 // import { ParticipantCount } from './ParticipantList';
-import { PollsToggle } from './PollsToggle';
+//import { PollsToggle } from './PollsToggle';
 import { WhiteboardToggle } from './WhiteboardToggle';
 import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../AppData/useUISettings';
+//import { useShowPolls } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -43,7 +43,7 @@ export const Footer = ({
 
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-  const { showPolls } = useShowPolls();
+  //const { showPolls } = useShowPolls();
 
   useEffect(() => {
     if (!isChatOpen && openByDefault) {
@@ -105,7 +105,7 @@ export const Footer = ({
       </AppFooter.Center>
       <AppFooter.Right>
         <WhiteboardToggle />
-        {showPolls && <PollsToggle />}
+        {/* {showPolls && <PollsToggle />} */}
         {!isMobile && elements?.chat && <ChatToggle />}
         {/* {elements?.participant_list && <ParticipantCount />} */}
         {/* <MoreSettings elements={elements} screenType={screenType} /> */}

@@ -25,7 +25,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const permissions = useHMSStore(selectPermissions);
-  const canEndActivity = !!permissions?.pollWrite;
+  const canEndActivity = !!permissions?.pollWrite && false;
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
