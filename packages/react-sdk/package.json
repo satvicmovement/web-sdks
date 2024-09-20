@@ -48,7 +48,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.12.19",
+    "@100mslive/hms-video-store": "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/100mslive-hms-video-store-0.12.19.0.tgz",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }
