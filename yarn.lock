@@ -7,6 +7,44 @@
   resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.1.tgz#037c8bdfb6b2d7bf12f9d257422150fe6ca43acb"
   integrity sha512-DGnzcXRDJREWypIjGX70er+f2k/XLLRF41lrXPs1+PtB1imdEkECPPS0Fg4BA0BCWKDNAGTZBHZPrBDgUmr9Lw==
 
+"@100mslive/hms-video-store@https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-hms-video-store-0.12.20.0.tgz":
+  version "0.12.20"
+  uid "0f4717be7a21f8ca2787364a6527e1e192828f00"
+  resolved "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-hms-video-store-0.12.20.0.tgz#0f4717be7a21f8ca2787364a6527e1e192828f00"
+  dependencies:
+    eventemitter2 "^6.4.9"
+    immer "^9.0.6"
+    lodash.isequal "^4.5.0"
+    reselect "4.0.0"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-virtual-background@https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-hms-virtual-background-1.13.20.0.tgz":
+  version "1.13.20"
+  resolved "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-hms-virtual-background-1.13.20.0.tgz#89d6ff123f3da4cec0d8715197b58e8e6d9b0bec"
+  dependencies:
+    "@mediapipe/selfie_segmentation" "^0.1.1632777926"
+    "@tensorflow-models/body-segmentation" "^1.0.1"
+    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
+    "@tensorflow/tfjs-converter" "^3.19.0"
+    "@tensorflow/tfjs-core" "^3.19.0"
+    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
+    "@webassemblyjs/wasm-gen" "1.11.1"
+    effects-sdk "3.2.3"
+    gifuct-js "^2.1.2"
+    wasm-check "^2.0.2"
+
+"@100mslive/react-sdk@https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-react-sdk-0.10.20.0.tgz":
+  version "0.10.20"
+  resolved "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-react-sdk-0.10.20.0.tgz#cc5a97db83fb824645a8a809bb1acb02fa7ababa"
+  dependencies:
+    "@100mslive/hms-video-store" "https://satvicmovement-bucket-1.s3.us-east-1.amazonaws.com/app/npmregistry/v2/web/100mslive-hms-video-store-0.12.20.0.tgz"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
+
 "@100mslive/types-prebuilt@0.12.12":
   version "0.12.12"
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.12.tgz#ead4edeed8e77e42154ac15cb36f32814ddaddd1"
