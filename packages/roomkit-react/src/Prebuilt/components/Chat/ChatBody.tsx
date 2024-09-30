@@ -16,6 +16,7 @@ import {
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
+  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { SolidPinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
@@ -424,6 +425,7 @@ const VirtualizedChatMessages = React.forwardRef<
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
     const hmsActions = useHMSActions();
+    const { isHLSRunning } = useRecordingStreaming();
     const messages = useHMSStore(selectHMSMessages);
     const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
     const filteredMessages = useMemo(() => {
@@ -433,6 +435,22 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
 
     const vanillaStore = useHMSVanillaStore();
     const rerenderOnFirstMount = useRef(false);
+
+    const sendTimedMetadata = async (poll_id: any) => {
+      // send hls timedmetadata when it is running
+      if (poll_id && isHLSRunning) {
+        try {
+          await hmsActions.sendHLSTimedMetadata([
+            {
+              payload: `poll:${poll_id}`,
+              duration: 100,
+            },
+          ]);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -465,6 +483,32 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
           hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: false });
         } else if (lastmessage.message === 'Chat is enabled now' && has_disableparams) {
           hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: true });
+        } else if (lastmessage.message.includes('Starting poll') && has_disableparams) {
+          console.log('smStartPoll msg > ', lastmessage.message);
+          const pollinfo = JSON.parse(lastmessage.message.split('#!#').at(-1) ?? '{}');
+          if (pollinfo && Object.keys(pollinfo).length > 0) {
+            const fnpoll = async () => {
+              await hmsActions.interactivityCenter.startPoll(pollinfo);
+              await sendTimedMetadata(pollinfo.pollId);
+            };
+            fnpoll().then(() => {
+              console.log('smStartPoll starting');
+            });
+          }
+          lastmessage.message = 'Starting poll';
+        } else if (lastmessage.message.includes('Starting quiz') && has_disableparams) {
+          console.log('smStartQuiz msg > ', lastmessage.message);
+          const quizinfo = JSON.parse(lastmessage.message.split('#!#').at(-1) ?? '{}');
+          if (quizinfo && Object.keys(quizinfo).length > 0) {
+            const fnpoll = async () => {
+              await hmsActions.interactivityCenter.startPoll(quizinfo);
+              await sendTimedMetadata(quizinfo.pollId);
+            };
+            fnpoll().then(() => {
+              console.log('smStartQuiz starting');
+            });
+          }
+          lastmessage.message = 'Starting quiz';
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
