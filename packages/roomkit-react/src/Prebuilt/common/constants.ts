@@ -48,6 +48,7 @@ export const APP_DATA = {
   caption: 'caption',
   loadingEffects: 'loadingEffects',
   noiseCancellation: 'noiseCancellation',
+  smAppData: 'smAppData',
 };
 
 export const UI_SETTINGS = {
@@ -73,6 +74,10 @@ export type SidePaneOption = (typeof SIDE_PANE_OPTIONS)[keyof typeof SIDE_PANE_O
 
 export const SHEET_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
+};
+
+export const SM_APP_DATA = {
+  smChatEnabled: 'smChatEnabled',
 };
 
 export const POLL_STATE = {
@@ -123,7 +128,6 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
-  SM_CHAT_STATUS = 'smchatstatus',
 }
 
 export enum INTERACTION_TYPE {

@@ -39,6 +39,7 @@ import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateC
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+import { useSetSMAppData } from './components/AppData/useSMAppData';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
@@ -49,7 +50,7 @@ import {
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
-import { DEFAULT_PORTAL_CONTAINER, SESSION_STORE_KEY } from './common/constants';
+import { DEFAULT_PORTAL_CONTAINER, SM_APP_DATA } from './common/constants';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -138,21 +139,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
-
-    useEffect(() => {
-      if (smAppProps) {
-        setTimeout(async () => {
-          if (!reactiveStore?.current) {
-            return;
-          }
-          console.log('[RJS Info] will update chatStatus to :: ', smAppProps.chatEnabled);
-          await reactiveStore.current.hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, {
-            smchatstatus: smAppProps.chatEnabled,
-          });
-        }, 3000);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [smAppProps, reactiveStore?.current]);
 
     const endpointsObj = endpoints as
       | {
@@ -258,6 +244,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                             <AppRoutes
                               authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
                               defaultAuthToken={authToken}
+                              smAppProps={smAppProps}
                             />
                           </Box>
                         </DialogContainerProvider>
@@ -307,13 +294,26 @@ const BackSwipe = () => {
 function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
+  smAppProps,
 }: {
   authTokenByRoomCodeEndpoint: string;
   defaultAuthToken?: string;
+  smAppProps?: {
+    chatEnabled: boolean;
+  };
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
+  const [, setSmChatEnabled] = useSetSMAppData(SM_APP_DATA.smChatEnabled);
+  useEffect(() => {
+    if (smAppProps) {
+      if (typeof setSmChatEnabled === 'function') {
+        setSmChatEnabled(smAppProps.chatEnabled);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [smAppProps]);
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>

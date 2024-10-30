@@ -25,11 +25,12 @@ import { Tooltip } from '../../../Tooltip';
 import { ChatActions } from './ChatActions';
 import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSetSMAppData } from '../AppData/useSMAppData';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { usePinnedBy } from '../hooks/usePinnedBy';
 import { formatTime } from './utils';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY, SM_APP_DATA } from '../../common/constants';
 
 const rowHeights: Record<number, { size: number; id: string }> = {};
 let listInstance: VariableSizeList | null = null; //eslint-disable-line
@@ -423,7 +424,6 @@ const VirtualizedChatMessages = React.forwardRef<
 
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
-    const hmsActions = useHMSActions();
     const messages = useHMSStore(selectHMSMessages);
     const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
     const filteredMessages = useMemo(() => {
@@ -433,6 +433,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
 
     const vanillaStore = useHMSVanillaStore();
     const rerenderOnFirstMount = useRef(false);
+    const [, setSmChatEnabled] = useSetSMAppData(SM_APP_DATA.smChatEnabled);
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -462,9 +463,13 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
           lastmessage.senderRole === '' &&
           lastmessage.senderUserId === '';
         if (lastmessage.message === 'Chat is disabled now' && has_disableparams) {
-          hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: false });
+          if (typeof setSmChatEnabled === 'function') {
+            setSmChatEnabled(false);
+          }
         } else if (lastmessage.message === 'Chat is enabled now' && has_disableparams) {
-          hmsActions.sessionStore.set(SESSION_STORE_KEY.SM_CHAT_STATUS, { smchatstatus: true });
+          if (typeof setSmChatEnabled === 'function') {
+            setSmChatEnabled(true);
+          }
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

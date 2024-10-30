@@ -25,6 +25,7 @@ import {
   CHAT_SELECTOR,
   POLL_STATE,
   SIDE_PANE_OPTIONS,
+  SM_APP_DATA,
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
@@ -72,6 +73,9 @@ const initialAppData = {
   // by default on because of on demand now, for beam disabled
   [APP_DATA.caption]: false,
   [APP_DATA.noiseCancellation]: false,
+  [APP_DATA.smAppData]: {
+    [SM_APP_DATA.smChatEnabled]: true,
+  },
 };
 
 export const AppData = React.memo(() => {

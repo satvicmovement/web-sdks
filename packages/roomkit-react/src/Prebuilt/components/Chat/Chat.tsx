@@ -18,9 +18,10 @@ import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
+import { useSMAppData } from '../AppData/useSMAppData';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
-import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS, SM_APP_DATA } from '../../common/constants';
 
 export const Chat = () => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
@@ -28,8 +29,7 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const { smchatstatus: isSMChatEnabled = true } =
-    useHMSStore(selectSessionStore(SESSION_STORE_KEY.SM_CHAT_STATUS)) || {};
+  const smChatEnabled = useSMAppData(SM_APP_DATA.smChatEnabled);
   const isMobile = useMedia(cssConfig.media.md);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
@@ -74,7 +74,7 @@ export const Chat = () => {
         )}
       </Flex>
       {isMobile && elements?.chat?.is_overlay && !streaming ? <PinnedMessage /> : null}
-      {isChatEnabled && isSMChatEnabled ? (
+      {isChatEnabled && smChatEnabled ? (
         <ChatFooter onSend={scrollToBottom}>
           <NewMessageIndicator scrollToBottom={scrollToBottom} listRef={listRef} />
         </ChatFooter>
