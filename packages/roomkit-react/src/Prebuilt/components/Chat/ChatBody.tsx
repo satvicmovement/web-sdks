@@ -425,6 +425,7 @@ const VirtualizedChatMessages = React.forwardRef<
 
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
+    const hmsActions = useHMSActions();
     const onSMCmd = useSMAppData(SM_APP_DATA.onSMCmd);
     const isLastMessageSMCmd = useCallback(
       (lastmessage: HMSMessage): boolean => {
@@ -525,6 +526,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       if (filteredCmds.length > 0) {
         const lastmessage = filteredCmds[filteredCmds.length - 1];
         const cmdmsg = JSON.parse(lastmessage.message);
+        hmsActions.setMessageRead(true, lastmessage.id);
         (onSMCmd as unknown as OnSMCmdHandler)(cmdmsg);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
