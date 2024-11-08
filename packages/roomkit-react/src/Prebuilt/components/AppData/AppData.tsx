@@ -75,6 +75,7 @@ const initialAppData = {
   [APP_DATA.noiseCancellation]: false,
   [APP_DATA.smAppData]: {
     [SM_APP_DATA.smChatEnabled]: true,
+    [SM_APP_DATA.onSMCmd]: undefined,
   },
 };
 

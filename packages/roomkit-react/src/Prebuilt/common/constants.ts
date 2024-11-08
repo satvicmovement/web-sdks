@@ -78,6 +78,7 @@ export const SHEET_OPTIONS = {
 
 export const SM_APP_DATA = {
   smChatEnabled: 'smChatEnabled',
+  onSMCmd: 'onSMCmd',
 };
 
 export const POLL_STATE = {

@@ -22,10 +22,11 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import { OnSMCmdHandler, SMCmd } from '../../AppContext';
 import { ChatActions } from './ChatActions';
 import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetSMAppData } from '../AppData/useSMAppData';
+import { useSetSMAppData, useSMAppData } from '../AppData/useSMAppData';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { usePinnedBy } from '../hooks/usePinnedBy';
@@ -424,12 +425,57 @@ const VirtualizedChatMessages = React.forwardRef<
 
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
+    const onSMCmd = useSMAppData(SM_APP_DATA.onSMCmd);
+    const isLastMessageSMCmd = useCallback(
+      (lastmessage: HMSMessage): boolean => {
+        let isCmd = false;
+        const isProbableCmd = lastmessage.message.startsWith('{');
+        const isModerator =
+          lastmessage.sender === '' &&
+          lastmessage.senderName === '' &&
+          lastmessage.senderRole === '' &&
+          lastmessage.senderUserId === '';
+        const isHandlerInstalled = typeof onSMCmd === 'function';
+        if (isModerator && isProbableCmd && isHandlerInstalled) {
+          try {
+            const cmdmsg = JSON.parse(lastmessage.message);
+            const cmd = cmdmsg.cmd ?? '';
+            if (cmd.startsWith('SM_') && cmd.endsWith('_CMD')) {
+              isCmd = true;
+            }
+          } catch (error) {
+            if (error instanceof SyntaxError) {
+              console.error('[SM_CMD] Failed to parse JSON:', error.message);
+            } else {
+              console.error('[SM_CMD] Unexpected error:', error);
+            }
+          }
+        }
+        return isCmd;
+      },
+      [onSMCmd],
+    );
     const messages = useHMSStore(selectHMSMessages);
     const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
     const filteredMessages = useMemo(() => {
       const blacklistedMessageIDSet = new Set(blacklistedMessageIDs || []);
-      return messages?.filter(message => !blacklistedMessageIDSet.has(message.id)) || [];
-    }, [blacklistedMessageIDs, messages]);
+      return (
+        messages?.filter(message => {
+          const isLstMsgCmd = isLastMessageSMCmd(message);
+          return !blacklistedMessageIDSet.has(message.id) && !isLstMsgCmd;
+        }) || []
+      );
+    }, [blacklistedMessageIDs, messages, isLastMessageSMCmd]);
+
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const filteredCmds = useMemo(() => {
+      return (
+        messages?.filter(message => {
+          const isLstMsgCmd = isLastMessageSMCmd(message);
+          return isLstMsgCmd;
+        }) || []
+      );
+    }, [messages, isLastMessageSMCmd]);
 
     const vanillaStore = useHMSVanillaStore();
     const rerenderOnFirstMount = useRef(false);
@@ -474,6 +520,15 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filteredMessages]);
+
+    useEffect(() => {
+      if (filteredCmds.length > 0) {
+        const lastmessage = filteredCmds[filteredCmds.length - 1];
+        const cmdmsg = JSON.parse(lastmessage.message);
+        (onSMCmd as unknown as OnSMCmdHandler)(cmdmsg);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filteredCmds]);
 
     useEffect(() => {
       // @ts-ignore

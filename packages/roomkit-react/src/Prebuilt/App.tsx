@@ -33,7 +33,7 @@ import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
-import { HMSPrebuiltContext } from './AppContext';
+import { HMSPrebuiltContext, OnSMCmdHandler } from './AppContext';
 import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
@@ -72,6 +72,7 @@ export type HMSPrebuiltProps = {
   onJoin?: () => void;
   smAppProps?: {
     chatEnabled: boolean;
+    onSMCmd?: OnSMCmdHandler;
   };
   /**
    * @remarks
@@ -300,16 +301,21 @@ function AppRoutes({
   defaultAuthToken?: string;
   smAppProps?: {
     chatEnabled: boolean;
+    onSMCmd?: OnSMCmdHandler;
   };
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
   const [, setSmChatEnabled] = useSetSMAppData(SM_APP_DATA.smChatEnabled);
+  const [, setOnSMCmd] = useSetSMAppData(SM_APP_DATA.onSMCmd);
   useEffect(() => {
     if (smAppProps) {
       if (typeof setSmChatEnabled === 'function') {
         setSmChatEnabled(smAppProps.chatEnabled);
+      }
+      if (typeof setOnSMCmd === 'function') {
+        setOnSMCmd(smAppProps.onSMCmd);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

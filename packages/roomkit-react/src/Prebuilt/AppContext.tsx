@@ -2,6 +2,17 @@ import React, { useContext } from 'react';
 // @ts-ignore
 import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
+export type OnSMCmdHandler = (cmd: SMCmdDtls) => void;
+export type SMCmdDtls = {
+  cmd: SMCmd;
+  data: SMCmdParams;
+};
+export type SMCmd = `SM_${string}_CMD`;
+
+export type SMCmdParams = {
+  [key: string]: string | SMCmdParams | SMCmdParams[];
+};
+
 type HMSPrebuiltContextType = {
   roomCode: string;
   userName?: string;
@@ -12,6 +23,7 @@ type HMSPrebuiltContextType = {
   onJoin?: () => void;
   smAppProps?: {
     chatEnabled: boolean;
+    onSMCmd?: OnSMCmdHandler;
   };
 };
 
@@ -23,7 +35,7 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   endpoints: {},
   onLeave: undefined,
   onJoin: undefined,
-  smAppProps: { chatEnabled: true },
+  smAppProps: { chatEnabled: true, onSMCmd: undefined },
 });
 
 HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';

@@ -29,7 +29,7 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const smChatEnabled = useSMAppData(SM_APP_DATA.smChatEnabled);
+  const smChatEnabled = useSMAppData(SM_APP_DATA.smChatEnabled) as unknown as boolean;
   const isMobile = useMedia(cssConfig.media.md);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();

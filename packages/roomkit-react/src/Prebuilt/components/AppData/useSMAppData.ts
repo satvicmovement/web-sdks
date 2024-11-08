@@ -17,7 +17,7 @@ type SetHMSAppDataTyp = {
  *    console.log(val); // {smChatEnabled: false | true}
  * @param {string | undefined} smAppDataKey
  */
-export const useSMAppData = (smAppDataKey?: (typeof SM_APP_DATA)[keyof typeof SM_APP_DATA]) => {
+export const useSMAppData = (smAppDataKey?: (typeof SM_APP_DATA)[keyof typeof SM_APP_DATA]): any => {
   const smAppData = useHMSStore(
     smAppDataKey ? selectAppDataByPath(APP_DATA.smAppData, smAppDataKey) : selectAppDataByPath(APP_DATA.smAppData),
   );
