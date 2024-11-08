@@ -22,7 +22,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-import { OnSMCmdHandler, SMCmd } from '../../AppContext';
+import { OnSMCmdHandler } from '../../AppContext';
 import { ChatActions } from './ChatActions';
 import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
