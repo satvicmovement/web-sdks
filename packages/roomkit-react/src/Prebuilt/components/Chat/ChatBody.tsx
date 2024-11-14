@@ -22,7 +22,6 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-import { OnSMCmdHandler } from '../../AppContext';
 import { ChatActions } from './ChatActions';
 import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -425,7 +424,6 @@ const VirtualizedChatMessages = React.forwardRef<
 
 export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
-    const hmsActions = useHMSActions();
     const onSMCmd = useSMAppData(SM_APP_DATA.onSMCmd);
     const isLastMessageSMCmd = useCallback(
       (lastmessage: HMSMessage): boolean => {
@@ -467,16 +465,6 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
         }) || []
       );
     }, [blacklistedMessageIDs, messages, isLastMessageSMCmd]);
-
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const filteredCmds = useMemo(() => {
-      return (
-        messages?.filter(message => {
-          const isLstMsgCmd = isLastMessageSMCmd(message);
-          return isLstMsgCmd;
-        }) || []
-      );
-    }, [messages, isLastMessageSMCmd]);
 
     const vanillaStore = useHMSVanillaStore();
     const rerenderOnFirstMount = useRef(false);
@@ -521,16 +509,6 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filteredMessages]);
-
-    useEffect(() => {
-      if (filteredCmds.length > 0) {
-        const lastmessage = filteredCmds[filteredCmds.length - 1];
-        const cmdmsg = JSON.parse(lastmessage.message);
-        hmsActions.setMessageRead(true, lastmessage.id);
-        (onSMCmd as unknown as OnSMCmdHandler)(cmdmsg);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filteredCmds]);
 
     useEffect(() => {
       // @ts-ignore

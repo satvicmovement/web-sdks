@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
@@ -8,6 +8,7 @@ import {
   HMSNotificationTypes,
   selectAppData,
   selectHLSState,
+  selectHMSMessages,
   selectPeerNameByID,
   selectPollByID,
   useHMSActions,
@@ -36,9 +37,17 @@ import { config, theme, useTheme } from '../../Theme';
 // import { Tooltip } from '../../Tooltip';
 import { WaitingView } from './WaitingView';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
+import { useSMAppData } from '../components/AppData/useSMAppData';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
-import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
+import {
+  APP_DATA,
+  EMOJI_REACTION_TYPE,
+  POLL_STATE,
+  POLL_VIEWS,
+  SIDE_PANE_OPTIONS,
+  SM_APP_DATA,
+} from '../common/constants';
 
 let hlsPlayer;
 const toastMap = {};
@@ -113,6 +122,70 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
+
+  // BEGIN SM EDITS
+  const onSMCmd = useSMAppData(SM_APP_DATA.onSMCmd);
+  const messages = useHMSStore(selectHMSMessages);
+  const isLastMessageSMCmd = useCallback(
+    lastmessage => {
+      //(lastmessage: HMSMessage): boolean => {
+      let isCmd = false;
+      const isProbableCmd = lastmessage.message.startsWith('{');
+      const isModerator =
+        lastmessage.sender === '' &&
+        lastmessage.senderName === '' &&
+        lastmessage.senderRole === '' &&
+        lastmessage.senderUserId === '';
+      const isHandlerInstalled = typeof onSMCmd === 'function';
+      if (isModerator && isProbableCmd && isHandlerInstalled) {
+        try {
+          const cmdmsg = JSON.parse(lastmessage.message);
+          const cmd = cmdmsg.cmd ?? '';
+          if (cmd.startsWith('SM_') && cmd.endsWith('_CMD')) {
+            isCmd = true;
+          }
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            console.error('[SM_CMD] Failed to parse JSON:', error.message);
+          } else {
+            console.error('[SM_CMD] Unexpected error:', error);
+          }
+        }
+      }
+      return isCmd;
+    },
+    [onSMCmd],
+  );
+
+  const filteredCmds = useMemo(() => {
+    return (
+      messages?.filter(message => {
+        const isLstMsgCmd = isLastMessageSMCmd(message);
+        return isLstMsgCmd;
+      }) || []
+    );
+  }, [messages, isLastMessageSMCmd]);
+
+  useEffect(() => {
+    if (filteredCmds.length > 0) {
+      const lastmessage = filteredCmds[filteredCmds.length - 1];
+      if (!lastmessage.read) {
+        const cmdmsg = JSON.parse(lastmessage.message);
+        hmsActions.setMessageRead(true, lastmessage.id);
+        //(onSMCmd as unknown as OnSMCmdHandler)(cmdmsg);
+        if (isFullScreen) {
+          toggle();
+          setTimeout(() => {
+            onSMCmd(cmdmsg);
+          }, 0);
+        } else {
+          onSMCmd(cmdmsg);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredCmds]);
+  // END SM EDITS
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
